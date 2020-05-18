@@ -29,7 +29,6 @@ main();
 document.addEventListener("keydown", storePos);
 
 function main() {
-
   hitWhichWall();
   setTimeout(function onTick() {
     if (stackPos.length > 1){
