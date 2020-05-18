@@ -1,9 +1,7 @@
 const CANVAS_BORDER_COLOUR = 'black';
 const CANVAS_BACKGROUND_COLOUR = 'white';
-const SNAKE_COLOUR = 'lightblue';
-const SNAKE_BORDER_COLOUR = 'navy';
-const FOOD_COLOUR = 'red';
-const FOOD_BORDER_COLOUR = 'darkred';
+const BRIX_COLOUR = 'lightblue';
+const BRIX_BORDER_COLOUR = 'navy';
 
 
 let brix = [
@@ -13,7 +11,7 @@ let brix = [
   {x: 50, y: 650},
 ];
 
-let GAME_SPEED = 120;
+let GAME_SPEED = 140;
 let score = 0;
 let dx = 10;
 let dy = 650;
@@ -35,7 +33,12 @@ function main() {
   hitWhichWall();
   setTimeout(function onTick() {
     if (stackPos.length > 1){
-      if (stackPos[stackPos.length-1].length === 0) {return};
+      if (stackPos[stackPos.length-1].length === 0) {
+        return
+      } else if (stackPos.length === 14){
+         window.alert('You Win');
+         return;
+     }
     }
     clearCanvas();
     advanceBrix(left, right);
@@ -139,19 +142,19 @@ function hitWhichWall() {
 
 function drawStack(){
   for (let i of stackPos) {
-    i.forEach(drawSnakePart);
+    i.forEach(drawEachBrick);
   }
 }
 
 function drawBrix(){
-  brix.forEach(drawSnakePart);
+  brix.forEach(drawEachBrick);
 };
 
-function drawSnakePart(snakePart) {
-  ctx.fillStyle = SNAKE_COLOUR;
-  ctx.strokestyle = SNAKE_BORDER_COLOUR;
-  ctx.fillRect(snakePart.x, snakePart.y, 50, 50);
-  ctx.strokeRect(snakePart.x, snakePart.y, 50, 50);
+function drawEachBrick(brick) {
+  ctx.fillStyle = BRIX_COLOUR;
+  ctx.strokestyle = BRIX_BORDER_COLOUR;
+  ctx.fillRect(brick.x, brick.y, 50, 50);
+  ctx.strokeRect(brick.x, brick.y, 50, 50);
 }
 
 function checkStackAlign() {
@@ -173,8 +176,20 @@ function storePos(event) {
     event.preventDefault();
     dy -= 50
     stackPos.push(brix);
+    if (stackPos.length === 1) {
+      score += 10;
+      document.getElementById('score').innerHTML = score;
+    }
     if (stackPos.length > 1){
+      score += 10;
+      document.getElementById('score').innerHTML = score;
       stackPos[stackPos.length-1]=checkStackAlign();
+      if (stackPos.length === 3) {
+        GAME_SPEED = 100;
+      }
+      if (stackPos.length === 6){
+        GAME_SPEED = 80;
+      }
     }
   }
 }
