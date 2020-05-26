@@ -18,6 +18,7 @@ let dy = 650;
 let right = true;
 let left = false;
 let stackPos = [];
+let brixLength = 4;
 
 
 const gameCanvas = document.getElementById('gameCanvas');
@@ -27,17 +28,20 @@ main();
 
 
 document.addEventListener("keydown", storePos);
+document.getElementById('reloadBtn').style.visibility = "hidden";
 
 function main() {
   hitWhichWall();
   setTimeout(function onTick() {
     if (stackPos.length > 1){
       if (stackPos[stackPos.length-1].length === 0) {
+        document.getElementById('reloadBtn').style.visibility = "visible";
+        document.removeEventListener("keydown", storePos);
         return
       } else if (stackPos.length === 14){
          window.alert('You Win');
-         return;
-     }
+         window.location.reload();
+      }
     }
     clearCanvas();
     advanceBrix(left, right);
@@ -57,7 +61,7 @@ function clearCanvas() {
 
 function advanceBrix(left, right) {
   if (left) {
-    switch (stackPos[stackPos.length-1] ? stackPos[stackPos.length-1].length : 4) {
+    switch (brixLength) {
       case 4:
         brix = [
           {x: brix[0].x-50, y: dy},
@@ -87,7 +91,7 @@ function advanceBrix(left, right) {
     }
 
   } else {
-      switch (brix.length) {
+      switch (brixLength) {
         case 4:
           brix = [
             {x: brix[0].x+50, y: dy},
@@ -183,10 +187,17 @@ function storePos(event) {
       score += 10;
       document.getElementById('score').innerHTML = score;
       stackPos[stackPos.length-1]=checkStackAlign();
+      brixLength = stackPos[stackPos.length-1].length;
       if (stackPos.length === 3) {
+        if(brixLength > 3){
+          brixLength -= 1;
+        }
         GAME_SPEED = 100;
       }
       if (stackPos.length === 6){
+        if(brixLength > 2){
+          brixLength -= 1;
+        }
         GAME_SPEED = 80;
       }
     }
