@@ -12,6 +12,11 @@
 
 #reloadBtn {
   position: absolute;
-  left: 48%;
-  top: 50%;
+  left: 46%;
+  top: 60%;
+}
+#startBtn {
+  position: absolute;
+  left: 46%;
+  top: 60%;
 }

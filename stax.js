@@ -1,7 +1,7 @@
 const CANVAS_BORDER_COLOUR = 'black';
-const CANVAS_BACKGROUND_COLOUR = 'white';
-const BRIX_COLOUR = 'lightblue';
-const BRIX_BORDER_COLOUR = 'navy';
+let CANVAS_BACKGROUND_COLOUR = 'azure';
+let BRIX_COLOUR = 'lightblue';
+let BRIX_BORDER_COLOUR = 'navy';
 
 
 let brix = [
@@ -19,16 +19,102 @@ let right = true;
 let left = false;
 let stackPos = [];
 let brixLength = 4;
-
+let level = 1;
+let circleRadius=10;
+let transitionDone = false;
+let initialLoad = true;
+let gameEnd = false;
 
 const gameCanvas = document.getElementById('gameCanvas');
 const ctx = gameCanvas.getContext("2d");
 
-main();
-
+// clearCanvas();
 
 document.addEventListener("keydown", storePos);
 document.getElementById('reloadBtn').style.visibility = "hidden";
+
+clearCanvas();
+drawGrad();
+
+function drawGrad() {
+  if (circleRadius===700) {
+    if (gameEnd){
+      drawStack();
+      return;
+    } else {
+      ctx.fillStyle = CANVAS_BACKGROUND_COLOUR;
+      ctx.fill();
+      circleRadius = 10;
+      GAME_SPEED = 140;
+      transitionDone = true;
+      stackPos = [];
+      dx = 10;
+      dy = 650;
+      right = true;
+      left = false;
+      brix = [
+        {x: 200, y: 650},
+        {x: 150, y: 650},
+        {x: 100, y: 650},
+        {x: 50, y: 650},
+      ];
+      if (level === 2) {
+        brixLength = 4;
+        GAME_SPEED = 120;
+        BRIX_COLOUR = 'green';
+        BRIX_BORDER_COLOUR = 'darkgreen';
+        CANVAS_BACKGROUND_COLOUR = 'palegreen'
+      }
+      if (level === 3) {
+        brixLength = 3;
+        GAME_SPEED = 120;
+        BRIX_COLOUR = 'lavender';
+        BRIX_BORDER_COLOUR = 'purple';
+        CANVAS_BACKGROUND_COLOUR = 'mediumorchid'
+      }
+      if (level === 4) {
+        brixLength = 3;
+        GAME_SPEED = 100;
+        BRIX_COLOUR = 'yellow';
+        BRIX_BORDER_COLOUR = 'orange';
+        CANVAS_BACKGROUND_COLOUR = 'papayawhip'
+      }
+      if (level === 5) {
+        brixLength = 2;
+        GAME_SPEED = 100;
+        BRIX_COLOUR = 'pink';
+        BRIX_BORDER_COLOUR = 'red';
+      }
+      return main();
+    }
+  }
+  setTimeout(function onTick() {
+    var x = 250;
+    var y = 350;
+    // Radii of the white glow.
+    innerRadius = 5;
+    outerRadius = 70;
+    // Radius of the entire circle.
+    radius = circleRadius;
+
+    let gradient = ctx.createRadialGradient(x, y, innerRadius, x, y, outerRadius);
+    gradient.addColorStop(0, 'white');
+    if (gameEnd){
+      gradient.addColorStop(1, 'pink');
+    } else {
+      gradient.addColorStop(1, CANVAS_BACKGROUND_COLOUR);
+    }
+    ctx.arc(x, y, radius, 0, 5 * Math.PI);
+
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    circleRadius += 10;
+    ctx.strokeRect(0,0, gameCanvas.width, gameCanvas.height);
+    drawGrad();
+    drawStack();
+  }, 10)
+}
 
 function main() {
   hitWhichWall();
@@ -37,23 +123,52 @@ function main() {
       if (stackPos[stackPos.length-1].length === 0) {
         document.getElementById('reloadBtn').style.visibility = "visible";
         document.removeEventListener("keydown", storePos);
+        gameEnd = true;
+        clearCanvas();
+        drawGrad();
         return
       } else if (stackPos.length === 14){
-         window.alert('You Win');
-         window.location.reload();
+         if (level === 5) {
+           window.alert('You have hit the max score on max level congrats!!');
+           window.location.reload();
+         }
+         window.alert('You Win-continue to next level');
+         clearCanvas();
+         level += 1;
+         if (level === 2) {
+           CANVAS_BACKGROUND_COLOUR = 'palegreen'
+         }
+         if (level === 3) {
+           CANVAS_BACKGROUND_COLOUR = 'mediumorchid'
+         }
+         if (level === 4) {
+           CANVAS_BACKGROUND_COLOUR = 'papayawhip'
+         }
+         if (level === 5) {
+           CANVAS_BACKGROUND_COLOUR = 'lavenderblush'
+         }
+         transitionDone = false;
+         drawGrad();
       }
     }
-    clearCanvas();
-    advanceBrix(left, right);
-    drawStack();
-    drawBrix();
-
-    main();
+    if (transitionDone){
+      clearCanvas();
+      advanceBrix(left, right);
+      drawStack();
+      drawBrix();
+      main();
+    }
   }, GAME_SPEED)
 }
 
 function clearCanvas() {
-  ctx.fillStyle = CANVAS_BACKGROUND_COLOUR;
+  if (initialLoad) {
+    ctx.fillStyle = 'white';
+    initialLoad = false;
+  }
+  else {
+    ctx.fillStyle = CANVAS_BACKGROUND_COLOUR;
+  }
   ctx.strokestyle = CANVAS_BORDER_COLOUR;
   ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
   ctx.strokeRect(0,0, gameCanvas.width, gameCanvas.height);
@@ -188,15 +303,15 @@ function storePos(event) {
       document.getElementById('score').innerHTML = score;
       stackPos[stackPos.length-1]=checkStackAlign();
       brixLength = stackPos[stackPos.length-1].length;
-      if (stackPos.length === 3) {
+      if (stackPos.length === 4) {
         if(brixLength > 3){
-          brixLength -= 1;
+          brixLength = brixLength;
         }
         GAME_SPEED = 100;
       }
-      if (stackPos.length === 6){
+      if (stackPos.length === 7){
         if(brixLength > 2){
-          brixLength -= 1;
+          brixLength = brixLength;
         }
         GAME_SPEED = 80;
       }
