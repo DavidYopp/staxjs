@@ -1,8 +1,7 @@
-const CANVAS_BORDER_COLOUR = 'black';
-let CANVAS_BACKGROUND_COLOUR = 'azure';
-let BRIX_COLOUR = 'lightblue';
-let BRIX_BORDER_COLOUR = 'navy';
-
+const CANVAS_BORDER_COLOR = 'black';
+let CANVAS_BACKGROUND_COLOR = 'azure';
+let BRIX_COLOR = 'lightblue';
+let BRIX_BORDER_COLOR = 'navy';
 
 let brix = [
   {x: 200, y: 650},
@@ -21,99 +20,59 @@ let stackPos = [];
 let brixLength = 4;
 let level = 1;
 let circleRadius=10;
-let transitionDone = false;
-let initialLoad = true;
 let gameEnd = false;
 
 const gameCanvas = document.getElementById('gameCanvas');
 const ctx = gameCanvas.getContext("2d");
 
-// clearCanvas();
 
-document.addEventListener("keydown", storePos);
+document.addEventListener("keydown", handleKeyPress);
 document.getElementById('reloadBtn').style.visibility = "hidden";
 
-clearCanvas();
-drawGrad();
+drawCanvas();
+main();
 
-function drawGrad() {
-  if (circleRadius===700) {
-    if (gameEnd){
-      drawStack();
-      return;
-    } else {
-      ctx.fillStyle = CANVAS_BACKGROUND_COLOUR;
-      ctx.fill();
-      circleRadius = 10;
-      GAME_SPEED = 140;
-      transitionDone = true;
-      stackPos = [];
-      dx = 10;
-      dy = 650;
-      right = true;
-      left = false;
-      brix = [
-        {x: 200, y: 650},
-        {x: 150, y: 650},
-        {x: 100, y: 650},
-        {x: 50, y: 650},
-      ];
-      if (level === 2) {
-        brixLength = 4;
-        GAME_SPEED = 120;
-        BRIX_COLOUR = 'green';
-        BRIX_BORDER_COLOUR = 'darkgreen';
-        CANVAS_BACKGROUND_COLOUR = 'palegreen'
-      }
-      if (level === 3) {
-        brixLength = 3;
-        GAME_SPEED = 120;
-        BRIX_COLOUR = 'lavender';
-        BRIX_BORDER_COLOUR = 'purple';
-        CANVAS_BACKGROUND_COLOUR = 'mediumorchid'
-      }
-      if (level === 4) {
-        brixLength = 3;
-        GAME_SPEED = 100;
-        BRIX_COLOUR = 'yellow';
-        BRIX_BORDER_COLOUR = 'orange';
-        CANVAS_BACKGROUND_COLOUR = 'papayawhip'
-      }
-      if (level === 5) {
-        brixLength = 2;
-        GAME_SPEED = 100;
-        BRIX_COLOUR = 'pink';
-        BRIX_BORDER_COLOUR = 'red';
-      }
-      return main();
-    }
+function resetStageVars() {
+  GAME_SPEED = 140;
+  stackPos = [];
+  dx = 10;
+  dy = 650;
+  right = true;
+  left = false;
+  brix = [
+    {x: 200, y: 650},
+    {x: 150, y: 650},
+    {x: 100, y: 650},
+    {x: 50, y: 650},
+  ];
+  if (level === 2) {
+    brixLength = 4;
+    GAME_SPEED = 120;
+    BRIX_COLOR = 'green';
+    BRIX_BORDER_COLOR = 'palegreen';
+    CANVAS_BACKGROUND_COLOR = 'darkgreen'
   }
-  setTimeout(function onTick() {
-    var x = 250;
-    var y = 350;
-    // Radii of the white glow.
-    innerRadius = 5;
-    outerRadius = 70;
-    // Radius of the entire circle.
-    radius = circleRadius;
-
-    let gradient = ctx.createRadialGradient(x, y, innerRadius, x, y, outerRadius);
-    gradient.addColorStop(0, 'white');
-    if (gameEnd){
-      gradient.addColorStop(1, 'pink');
-    } else {
-      gradient.addColorStop(1, CANVAS_BACKGROUND_COLOUR);
-    }
-    ctx.arc(x, y, radius, 0, 5 * Math.PI);
-
-    ctx.fillStyle = gradient;
-    ctx.fill();
-
-    circleRadius += 10;
-    ctx.strokeRect(0,0, gameCanvas.width, gameCanvas.height);
-    drawGrad();
-    drawStack();
-  }, 10)
+  if (level === 3) {
+    brixLength = 3;
+    GAME_SPEED = 120;
+    BRIX_COLOR = 'lavender';
+    BRIX_BORDER_COLOR = 'purple';
+    CANVAS_BACKGROUND_COLOR = 'mediumorchid'
+  }
+  if (level === 4) {
+    brixLength = 3;
+    GAME_SPEED = 100;
+    BRIX_COLOR = 'tomato';
+    BRIX_BORDER_COLOR = 'orange';
+    CANVAS_BACKGROUND_COLOR = 'papayawhip'
+  }
+  if (level === 5) {
+    brixLength = 2;
+    GAME_SPEED = 100;
+    BRIX_COLOR = 'pink';
+    BRIX_BORDER_COLOR = 'red';
+    CANVAS_BACKGROUND_COLOR = 'lavenderblush'
+  }
 }
 
 function main() {
@@ -122,56 +81,44 @@ function main() {
     if (stackPos.length > 1){
       if (stackPos[stackPos.length-1].length === 0) {
         document.getElementById('reloadBtn').style.visibility = "visible";
-        document.removeEventListener("keydown", storePos);
+        document.removeEventListener("keydown", handleKeyPress);
         gameEnd = true;
-        clearCanvas();
-        drawGrad();
-        return
+        CANVAS_BACKGROUND_COLOR = 'pink'
+        drawCanvas();
+        drawStack();
+        return;
       } else if (stackPos.length === 14){
          if (level === 5) {
            window.alert('You have hit the max score on max level congrats!!');
            window.location.reload();
          }
          window.alert('You Win-continue to next level');
-         clearCanvas();
          level += 1;
-         if (level === 2) {
-           CANVAS_BACKGROUND_COLOUR = 'palegreen'
-         }
-         if (level === 3) {
-           CANVAS_BACKGROUND_COLOUR = 'mediumorchid'
-         }
-         if (level === 4) {
-           CANVAS_BACKGROUND_COLOUR = 'papayawhip'
-         }
-         if (level === 5) {
-           CANVAS_BACKGROUND_COLOUR = 'lavenderblush'
-         }
-         transitionDone = false;
-         drawGrad();
+         resetStageVars()
+         drawCanvas();
       }
     }
-    if (transitionDone){
-      clearCanvas();
+      drawCanvas();
       advanceBrix(left, right);
       drawStack();
       drawBrix();
       main();
-    }
   }, GAME_SPEED)
 }
 
-function clearCanvas() {
-  if (initialLoad) {
-    ctx.fillStyle = 'white';
-    initialLoad = false;
-  }
-  else {
-    ctx.fillStyle = CANVAS_BACKGROUND_COLOUR;
-  }
-  ctx.strokestyle = CANVAS_BORDER_COLOUR;
+function drawCanvas() {
+  ctx.fillStyle = CANVAS_BACKGROUND_COLOR;
+  ctx.strokestyle = CANVAS_BORDER_COLOR;
   ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
   ctx.strokeRect(0,0, gameCanvas.width, gameCanvas.height);
+  ctx.strokeStyle = BRIX_COLOR;
+  for (let i = 0; i <= gameCanvas.width; i += 50){
+    for (let j = 0; j <= gameCanvas.height; j += 50){
+      ctx.strokeRect(i,j, 50, 50);
+    }
+  }
+  ctx.strokeStyle = BRIX_BORDER_COLOR;
+
 }
 
 function advanceBrix(left, right) {
@@ -269,8 +216,8 @@ function drawBrix(){
 };
 
 function drawEachBrick(brick) {
-  ctx.fillStyle = BRIX_COLOUR;
-  ctx.strokestyle = BRIX_BORDER_COLOUR;
+  ctx.fillStyle = BRIX_COLOR;
+  ctx.strokestyle = BRIX_BORDER_COLOR;
   ctx.fillRect(brick.x, brick.y, 50, 50);
   ctx.strokeRect(brick.x, brick.y, 50, 50);
 }
@@ -289,7 +236,7 @@ function checkStackAlign() {
 return newArr;
 }
 
-function storePos(event) {
+function handleKeyPress(event) {
   if (event.keyCode === 32) {
     event.preventDefault();
     dy -= 50
